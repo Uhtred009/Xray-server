@@ -3,16 +3,21 @@ module github.com/xtls/xray-core
 go 1.15
 
 require (
+	code.cloudfoundry.org/bytefmt v0.0.0-20200131002437-cf55d5288a48 // indirect
+	github.com/Uhtred009/v2ray-ssrpanel-plugin v0.3.4
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3
 	github.com/google/go-cmp v0.5.4
 	github.com/gorilla/websocket v1.4.2
+	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/lucas-clemente/quic-go v0.19.3
 	github.com/miekg/dns v1.1.37
 	github.com/pelletier/go-toml v1.8.1
 	github.com/pires/go-proxyproto v0.4.2
+	github.com/robfig/cron v1.2.0 // indirect
 	github.com/seiflotfy/cuckoofilter v0.0.0-20201222105146-bc6005554a0c
+	github.com/shirou/gopsutil v3.21.1+incompatible // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/xtls/go v0.0.0-20201118062508-3632bf3b7499
 	go.starlark.net v0.0.0-20210126161401-bc864be25151
@@ -23,4 +28,5 @@ require (
 	google.golang.org/grpc v1.35.0
 	google.golang.org/protobuf v1.25.0
 	h12.io/socks v1.0.2
+	v2ray.com/core v4.19.1+incompatible // indirect
 )

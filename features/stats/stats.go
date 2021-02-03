@@ -4,6 +4,7 @@ package stats
 
 import (
 	"context"
+	"net"
 
 	"github.com/xtls/xray-core/common"
 	"github.com/xtls/xray-core/features"
@@ -19,6 +20,13 @@ type Counter interface {
 	Set(int64) int64
 	// Add adds a value to the current counter value, and returns the previous value.
 	Add(int64) int64
+}
+
+type IPStorager interface {
+	Add(net.IP) bool
+	Empty()
+	Remove(net.IP) bool
+	All() []net.IP
 }
 
 // Channel is the interface for stats channel.
@@ -77,6 +85,9 @@ type Manager interface {
 	UnregisterChannel(string) error
 	// GetChannel returns a channel by its identifier.
 	GetChannel(string) Channel
+
+	RegisterIPStorager(string) (IPStorager, error)
+	GetIPStorager(string) IPStorager
 }
 
 // GetOrRegisterCounter tries to get the StatCounter first. If not exist, it then tries to create a new counter.
@@ -97,6 +108,16 @@ func GetOrRegisterChannel(m Manager, name string) (Channel, error) {
 	}
 
 	return m.RegisterChannel(name)
+}
+
+
+func GetOrRegisterIPStorager(m Manager, name string) (IPStorager, error) {
+	ipStorager := m.GetIPStorager(name)
+	if ipStorager != nil {
+		return ipStorager, nil
+	}
+
+	return m.RegisterIPStorager(name)
 }
 
 // ManagerType returns the type of Manager interface. Can be used to implement common.HasType.
@@ -141,6 +162,15 @@ func (NoopManager) UnregisterChannel(string) error {
 
 // GetChannel implements Manager.
 func (NoopManager) GetChannel(string) Channel {
+	return nil
+}
+
+
+func (NoopManager) RegisterIPStorager(string) (IPStorager, error) {
+	return nil, newError("not implemented")
+}
+
+func (NoopManager) GetIPStorager(string) IPStorager {
 	return nil
 }
 

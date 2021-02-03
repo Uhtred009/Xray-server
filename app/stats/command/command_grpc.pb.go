@@ -11,7 +11,6 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // StatsServiceClient is the client API for StatsService service.
@@ -21,6 +20,7 @@ type StatsServiceClient interface {
 	GetStats(ctx context.Context, in *GetStatsRequest, opts ...grpc.CallOption) (*GetStatsResponse, error)
 	QueryStats(ctx context.Context, in *QueryStatsRequest, opts ...grpc.CallOption) (*QueryStatsResponse, error)
 	GetSysStats(ctx context.Context, in *SysStatsRequest, opts ...grpc.CallOption) (*SysStatsResponse, error)
+	GetUserIPStats(ctx context.Context, in *GetStatsRequest, opts ...grpc.CallOption) (*GetUserIPStatsResponse, error)
 }
 
 type statsServiceClient struct {
@@ -58,6 +58,15 @@ func (c *statsServiceClient) GetSysStats(ctx context.Context, in *SysStatsReques
 	return out, nil
 }
 
+func (c *statsServiceClient) GetUserIPStats(ctx context.Context, in *GetStatsRequest, opts ...grpc.CallOption) (*GetUserIPStatsResponse, error) {
+	out := new(GetUserIPStatsResponse)
+	err := c.cc.Invoke(ctx, "/xray.app.stats.command.StatsService/GetUserIPStats", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StatsServiceServer is the server API for StatsService service.
 // All implementations must embed UnimplementedStatsServiceServer
 // for forward compatibility
@@ -65,6 +74,7 @@ type StatsServiceServer interface {
 	GetStats(context.Context, *GetStatsRequest) (*GetStatsResponse, error)
 	QueryStats(context.Context, *QueryStatsRequest) (*QueryStatsResponse, error)
 	GetSysStats(context.Context, *SysStatsRequest) (*SysStatsResponse, error)
+	GetUserIPStats(context.Context, *GetStatsRequest) (*GetUserIPStatsResponse, error)
 	mustEmbedUnimplementedStatsServiceServer()
 }
 
@@ -81,6 +91,9 @@ func (UnimplementedStatsServiceServer) QueryStats(context.Context, *QueryStatsRe
 func (UnimplementedStatsServiceServer) GetSysStats(context.Context, *SysStatsRequest) (*SysStatsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSysStats not implemented")
 }
+func (UnimplementedStatsServiceServer) GetUserIPStats(context.Context, *GetStatsRequest) (*GetUserIPStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserIPStats not implemented")
+}
 func (UnimplementedStatsServiceServer) mustEmbedUnimplementedStatsServiceServer() {}
 
 // UnsafeStatsServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -90,8 +103,8 @@ type UnsafeStatsServiceServer interface {
 	mustEmbedUnimplementedStatsServiceServer()
 }
 
-func RegisterStatsServiceServer(s grpc.ServiceRegistrar, srv StatsServiceServer) {
-	s.RegisterService(&StatsService_ServiceDesc, srv)
+func RegisterStatsServiceServer(s *grpc.Server, srv StatsServiceServer) {
+	s.RegisterService(&StatsService_serviceDesc, srv)
 }
 
 func _StatsService_GetStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -148,10 +161,25 @@ func _StatsService_GetSysStats_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-// StatsService_ServiceDesc is the grpc.ServiceDesc for StatsService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var StatsService_ServiceDesc = grpc.ServiceDesc{
+func _StatsService_GetUserIPStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatsServiceServer).GetUserIPStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/xray.app.stats.command.StatsService/GetUserIPStats",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatsServiceServer).GetUserIPStats(ctx, req.(*GetStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var StatsService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "xray.app.stats.command.StatsService",
 	HandlerType: (*StatsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
@@ -167,7 +195,11 @@ var StatsService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetSysStats",
 			Handler:    _StatsService_GetSysStats_Handler,
 		},
+		{
+			MethodName: "GetUserIPStats",
+			Handler:    _StatsService_GetUserIPStats_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "app/stats/command/command.proto",
+	Metadata: "command.proto",
 }

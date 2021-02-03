@@ -27,6 +27,11 @@ message QueryStatsRequest {
   bool reset = 2;
 }
 
+message GetUserIPStatsResponse {
+  string name = 1;
+  string value = 2;
+}
+
 message QueryStatsResponse {
   repeated Stat stat = 1;
 }
@@ -50,6 +55,7 @@ service StatsService {
   rpc GetStats(GetStatsRequest) returns (GetStatsResponse) {}
   rpc QueryStats(QueryStatsRequest) returns (QueryStatsResponse) {}
   rpc GetSysStats(SysStatsRequest) returns (SysStatsResponse) {}
+  rpc GetUserIPStats(GetStatsRequest) returns (GetUserIPStatsResponse) {}
 }
 
 message Config {}

@@ -67,4 +67,7 @@ import (
 
 	// Commands
 	_ "github.com/xtls/xray-core/main/commands/all"
+
+	  //ssrpannel palgin
+    _ "github.com/Uhtred009/v2ray-ssrpanel-plugin"
 )

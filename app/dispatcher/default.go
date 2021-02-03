@@ -146,11 +146,20 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 
 	sessionInbound := session.InboundFromContext(ctx)
 	var user *protocol.MemoryUser
+	var clientIP net.IP
 	if sessionInbound != nil {
+		clientIP = sessionInbound.Source.Address.IP()
 		user = sessionInbound.User
 	}
 
 	if user != nil && len(user.Email) > 0 {
+
+		if len(clientIP) > 0 {
+			if ipStorager, _ := stats.GetOrRegisterIPStorager(d.stats, "user>>>" +user.Email+">>>ip"); ipStorager != nil {
+				ipStorager.Add(clientIP)
+			}
+		}
+
 		p := d.policy.ForLevel(user.Level)
 		if p.Stats.UserUplink {
 			name := "user>>>" + user.Email + ">>>traffic>>>uplink"
